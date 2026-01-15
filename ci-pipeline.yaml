@@ -1,0 +1,30 @@
+trigger: none
+
+variables:
+  imageName: 'my-python-app'
+  dockerHubUsername: 'shirashani'
+  dockerHubPassword: 'dockerhub'  
+
+stages:
+  # ------------------------------
+  # Build and Push Docker Image
+  # ------------------------------
+  - stage: BuildAndPush
+    displayName: "Build and Push Docker Image"
+    jobs:
+      - job: Build
+        pool:
+          name: Local-Agent-Pool  
+        steps:
+          - script: |
+              docker login -u $(dockerHubUsername) -p $(dockerHubPassword)
+            displayName: 'Login to Docker Hub'
+
+          - script: |
+              docker build -t $(dockerHubUsername)/$(imageName):latest CICD/CI
+            displayName: 'Build Docker Image'
+
+          - script: |
+              docker push $(dockerHubUsername)/$(imageName):latest
+            displayName: 'Push Docker Image to Docker Hub'
+
